@@ -75,6 +75,13 @@ const Tarefas = () => {
         return true; // filtro === "todas"
     })
 
+    // Função que devolve as classes de cor do Tailwind de acordo com a prioridade da tarefa
+    const corPrioridade = (prioridade) => {
+        if (prioridade === "Alta") return "bg-red-500 text-white";
+        if (prioridade === "Média") return "bg-amber-400 text-indigo-950";
+        return "bg-green-500 text-white"; // Baixa
+    }
+
 
   return (
     <div className ='max-w-md mx-auto mt-10 bg-indigo-500 rounded-2xl shadow-indigo-950- border-b-blue-950 p-6' >
@@ -125,12 +132,12 @@ const Tarefas = () => {
         </div>
 
         <ul className='space-y-3'>
-            {/* map percorre o array tarefasFiltradas (não mais o tarefas direto) e desenha um <li> pra cada uma */}
+            {/* map percorre o array tarefasFiltradas e desenha um <li> pra cada tarefa */}
             {tarefasFiltradas.map((tarefa)=>(
                 <li key={tarefa.id} className='flex flex-col gap-2 p-3 bg-indigo-900 border border-amber-400 rounded-2xl shadow-sm hover:bg-indigo-500 transition-colors'>
                     <div className="flex items-center justify-between">
                         <span className={`font-bold text-white ${tarefa.concluida ? "line-through opacity-60" : ""}`}>{tarefa.nome}</span>
-                        <span className="text-xs text-amber-300">{tarefa.prioridade}</span>
+                        <span className={`text-xs px-3 py-1 rounded-2xl ${corPrioridade(tarefa.prioridade)}`}>{tarefa.prioridade}</span>
                     </div>
 
                     {tarefa.data && <span className="text-sm text-amber-300">Data: {tarefa.data}</span>}
@@ -148,7 +155,7 @@ const Tarefas = () => {
 
         </ul>
         {tarefasFiltradas.length == 0 && <p className="text-center italic mt-4 text-white"> Nenhuma tarefa encontrada</p>}
-
+      
     </div>
   )
 }
