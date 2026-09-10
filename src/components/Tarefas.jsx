@@ -46,6 +46,16 @@ const Tarefas = () => {
         setCampoPrioridade('Baixa');
     }
 
+    const ConcluirTarefa = (id) => {
+        // Usa o método map para percorrer todas as tarefas: a tarefa com o id clicado
+        // tem o campo "concluida" invertido (true vira false e false vira true),
+        // as outras tarefas voltam do jeito que já estavam
+        const atualizarTarefas = tarefas.map((tarefa) =>
+            tarefa.id === id ? { ...tarefa, concluida: !tarefa.concluida } : tarefa
+        );
+        setTarefas(atualizarTarefas);
+    }
+
 
   return (
     <div className ='max-w-md mx-auto mt-10 bg-indigo-500 rounded-2xl shadow-indigo-950- border-b-blue-950 p-6' >
@@ -93,18 +103,24 @@ const Tarefas = () => {
             {tarefas.map((tarefa)=>(
                 <li key={tarefa.id} className='flex flex-col gap-2 p-3 bg-indigo-900 border border-amber-400 rounded-2xl shadow-sm hover:bg-indigo-500 transition-colors'>
                     <div className="flex items-center justify-between">
-                        <span className="font-bold text-white">{tarefa.nome}</span>
+                        <span className={`font-bold text-white ${tarefa.concluida ? "line-through opacity-60" : ""}`}>{tarefa.nome}</span>
                         <span className="text-xs text-amber-300">{tarefa.prioridade}</span>
                     </div>
 
                     {tarefa.data && <span className="text-sm text-amber-300">Data: {tarefa.data}</span>}
                     {tarefa.descricao && <span className="text-sm text-white">{tarefa.descricao}</span>}
+
+                    <div className="flex justify-end mt-1">
+                        {/* callback passado pro onClick: uma função anônima que chama ConcluirTarefa com o id da tarefa */}
+                        <button onClick={() => ConcluirTarefa(tarefa.id)} className="bg-green-500 hover:bg-green-700 text-white font-medium px-4 rounded-2xl transition-colors cursor-pointer">
+                            {tarefa.concluida ? "Desmarcar" : "Concluir"}
+                        </button>
+                    </div>
                 </li>
             ))}
 
         </ul>
         {tarefas.length == 0 && <p className="text-center italic mt-4 text-white"> Nenhuma tarefa salva</p>}
-
 
     </div>
   )
