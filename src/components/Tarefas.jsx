@@ -3,35 +3,27 @@ import '../css/estilo.css'
 
 const Tarefas = () => {
 
-    // Hook - useState - Manipula o estado da variável
-    // Cada tarefa vai ser um objeto com: nome, data, descricao, prioridade e concluida
+    // Hook - useState - guarda a lista de tarefas, já lendo do localStorage na primeira renderização
     const [tarefas,setTarefas]=useState(() =>{
         const salvarTarefas = localStorage.getItem("Item-tarefa");
         return salvarTarefas ? JSON.parse(salvarTarefas) : [];
     });
 
-    // Um estado para cada campo do formulário (Nome, Data, Descrição e Prioridade)
     const [campoNome, setCampoNome] = useState("");
     const [campoData, setCampoData] = useState("");
     const [campoDescricao, setCampoDescricao] = useState("");
     const [campoPrioridade, setCampoPrioridade] = useState("Baixa");
-
-    // Estado que controla qual filtro está ativo: "todas", "pendentes" ou "concluidas"
     const [filtro, setFiltro] = useState("todas");
 
-// HOOK - useEffect - realiza o efeito colateral, nesse caso salva a lista de tarefas
-// no localStorage toda vez que o componente renderizar
-        useEffect(() => {
-            localStorage.setItem("Item-tarefa", JSON.stringify(tarefas))
-        })
+    // Hook - useEffect - toda vez que "tarefas" muda, salva a lista atualizada no localStorage
+    useEffect(() => {
+        localStorage.setItem("Item-tarefa", JSON.stringify(tarefas))
+    })
 
     const adicionarTarefa = (e) => {
-        // Previne que a página se recarregue automaticamnete 
         e.preventDefault();
-        // valida se o campo nome estiver vazio
         if (!campoNome.trim()) return;
 
-        // novo objeto (objeto = tudo que você pode dar característivas a ele)
         const novaTarefa={
             id: Date.now(),
             nome: campoNome,
@@ -42,7 +34,6 @@ const Tarefas = () => {
         }
 
         setTarefas([...tarefas, novaTarefa]);
-        // Limpa os campos do formulário depois de adicionar
         setCampoNome('');
         setCampoData('');
         setCampoDescricao('');
@@ -50,9 +41,7 @@ const Tarefas = () => {
     }
 
     const ConcluirTarefa = (id) => {
-        // Usa o método map para percorrer todas as tarefas: a tarefa com o id clicado
-        // tem o campo "concluida" invertido (true vira false e false vira true),
-        // as outras tarefas voltam do jeito que já estavam
+        // map percorre todas as tarefas e troca o "concluida" só da que tem o id clicado
         const atualizarTarefas = tarefas.map((tarefa) =>
             tarefa.id === id ? { ...tarefa, concluida: !tarefa.concluida } : tarefa
         );
@@ -60,102 +49,122 @@ const Tarefas = () => {
     }
 
     const RemoverTarefa=(id) => {
-        // Verifica se a tarefa atual é diferente do id que deseja apagar se o id for igual (tarefa que deseja apagar) a 
-        // comdição retorna false e o item é excluido 
+        // filter devolve um novo array sem a tarefa cujo id é igual ao clicado
         const apagarTarefa = tarefas.filter((tarefa)=> tarefa.id !== id)
         setTarefas(apagarTarefa);
-
     }
 
-    // Usa o método filter para decidir quais tarefas aparecem na tela
-    // de acordo com o botão de filtro selecionado
+    // filter aplicado de novo aqui pra decidir o que aparece na tela conforme o filtro ativo
     const tarefasFiltradas = tarefas.filter((tarefa) => {
         if (filtro === "pendentes") return !tarefa.concluida;
         if (filtro === "concluidas") return tarefa.concluida;
-        return true; // filtro === "todas"
+        return true;
     })
 
-    // Função que devolve as classes de cor do Tailwind de acordo com a prioridade da tarefa
     const corPrioridade = (prioridade) => {
-        if (prioridade === "Alta") return "bg-red-500 text-white";
-        if (prioridade === "Média") return "bg-amber-400 text-indigo-950";
-        return "bg-green-500 text-white"; // Baixa
+        if (prioridade === "Alta") return "border-red-500/40 bg-red-500/10 text-red-400";
+        if (prioridade === "Média") return "border-yellow-400/40 bg-yellow-400/10 text-yellow-300";
+        return "border-green-500/40 bg-green-500/10 text-green-400";
     }
 
 
   return (
-    <div className ='max-w-md mx-auto mt-10 bg-indigo-500 rounded-2xl shadow-indigo-950- border-b-blue-950 p-6' >
-        <h1 className = "text-2xl font-bold text-white text-center mb-4"> Minha lista de tarefas </h1>
+    <div className='max-w-2xl mx-auto mt-10 mb-10 bg-zinc-900 rounded-2xl p-8 border border-zinc-800 shadow-xl shadow-black/40'>
 
-        <form onSubmit={adicionarTarefa} className="flex flex-col gap-2 mb-6">
-            <input 
-            type="text" 
-            value={campoNome}
-            onChange={(e) => setCampoNome(e.target.value)}
-            placeholder="Nome da tarefa"
-            className = "px-4 py-2 border-gray-700 rounded-2xl focus:outline-none  focus:ring-1 focus:ring-yellow-200 focus:border-transparent text-black placeholder:text-gray-750"
-            />
+        <h1 className="text-2xl font-bold text-white text-center mb-6"> Minha Lista de Tarefas </h1>
 
-            <input 
-            type="date" 
-            value={campoData}
-            onChange={(e) => setCampoData(e.target.value)}
-            className = "px-4 py-2 border-gray-700 rounded-2xl focus:outline-none  focus:ring-1 focus:ring-yellow-200 focus:border-transparent text-black"
-            />
+        <form onSubmit={adicionarTarefa} className="grid grid-cols-2 gap-4 mb-8 pb-8 border-b border-zinc-800">
+            <div className="flex flex-col gap-1">
+                <label className="text-zinc-500 text-sm">Nome</label>
+                <input 
+                type="text" 
+                value={campoNome}
+                onChange={(e) => setCampoNome(e.target.value)}
+                placeholder="Nome da tarefa"
+                className="px-3 py-2 rounded-lg bg-zinc-800 border border-zinc-700 focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400 text-white placeholder:text-zinc-600"
+                />
+            </div>
 
-            <input 
-            type="text" 
-            value={campoDescricao}
-            onChange={(e) => setCampoDescricao(e.target.value)}
-            placeholder="Descrição da tarefa"
-            className = "px-4 py-2 border-gray-700 rounded-2xl focus:outline-none  focus:ring-1 focus:ring-yellow-200 focus:border-transparent text-black placeholder:text-gray-750"
-            />
+            <div className="flex flex-col gap-1">
+                <label className="text-zinc-500 text-sm">Data</label>
+                <input 
+                type="date" 
+                value={campoData}
+                onChange={(e) => setCampoData(e.target.value)}
+                className="px-3 py-2 rounded-lg bg-zinc-800 border border-zinc-700 focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400 text-white"
+                />
+            </div>
 
-            <select
-            value={campoPrioridade}
-            onChange={(e) => setCampoPrioridade(e.target.value)}
-            className="px-4 py-2 border-gray-700 rounded-2xl focus:outline-none focus:ring-1 focus:ring-yellow-200 focus:border-transparent text-black"
-            >
-                <option value="Baixa">Prioridade Baixa</option>
-                <option value="Média">Prioridade Média</option>
-                <option value="Alta">Prioridade Alta</option>
-            </select>
+            <div className="flex flex-col gap-1 col-span-2">
+                <label className="text-zinc-500 text-sm">Descrição</label>
+                <input 
+                type="text" 
+                value={campoDescricao}
+                onChange={(e) => setCampoDescricao(e.target.value)}
+                placeholder="Descrição da tarefa"
+                className="px-3 py-2 rounded-lg bg-zinc-800 border border-zinc-700 focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400 text-white placeholder:text-zinc-600"
+                />
+            </div>
 
-            <button type="submit" className=" bg-indigo-950 hover:bg-indigo-400 text-amber-300 font-medium px-5 py-2 rounded-2xl transition-colors cursor-pointer"> Adicionar </button>
+            <div className="flex flex-col gap-1">
+                <label className="text-zinc-500 text-sm">Prioridade</label>
+                <select
+                value={campoPrioridade}
+                onChange={(e) => setCampoPrioridade(e.target.value)}
+                className="px-3 py-2 rounded-lg bg-zinc-800 border border-zinc-700 focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400 text-white"
+                >
+                    <option value="Baixa">Baixa</option>
+                    <option value="Média">Média</option>
+                    <option value="Alta">Alta</option>
+                </select>
+            </div>
+
+            <div className="flex items-end">
+                <button type="submit" className="w-full bg-sky-500 hover:bg-sky-400 text-zinc-950 font-semibold py-2 rounded-lg transition-colors cursor-pointer"> Adicionar Tarefa </button>
+            </div>
         </form>
 
-        {/* Botões de filtro rápido (Todas, Pendentes, Concluídas) */}
-        <div className="flex gap-2 mb-4 justify-center">
-            <button onClick={() => setFiltro("todas")} className={`px-4 py-1 rounded-2xl font-medium cursor-pointer transition-colors ${filtro === "todas" ? "bg-indigo-950 text-amber-300" : "bg-indigo-400 text-white hover:bg-indigo-950"}`}> Todas </button>
-            <button onClick={() => setFiltro("pendentes")} className={`px-4 py-1 rounded-2xl font-medium cursor-pointer transition-colors ${filtro === "pendentes" ? "bg-indigo-950 text-amber-300" : "bg-indigo-400 text-white hover:bg-indigo-950"}`}> Pendentes </button>
-            <button onClick={() => setFiltro("concluidas")} className={`px-4 py-1 rounded-2xl font-medium cursor-pointer transition-colors ${filtro === "concluidas" ? "bg-indigo-950 text-amber-300" : "bg-indigo-400 text-white hover:bg-indigo-950"}`}> Concluídas </button>
+        <div className="flex gap-6 mb-4">
+            <button onClick={() => setFiltro("todas")} className={`text-sm font-medium pb-1 cursor-pointer transition-colors ${filtro === "todas" ? "text-sky-400 border-b-2 border-sky-400" : "text-zinc-500 hover:text-white"}`}> Todas </button>
+            <button onClick={() => setFiltro("pendentes")} className={`text-sm font-medium pb-1 cursor-pointer transition-colors ${filtro === "pendentes" ? "text-sky-400 border-b-2 border-sky-400" : "text-zinc-500 hover:text-white"}`}> Pendentes </button>
+            <button onClick={() => setFiltro("concluidas")} className={`text-sm font-medium pb-1 cursor-pointer transition-colors ${filtro === "concluidas" ? "text-sky-400 border-b-2 border-sky-400" : "text-zinc-500 hover:text-white"}`}> Concluídas </button>
         </div>
 
-        <ul className='space-y-3'>
-            {/* map percorre o array tarefasFiltradas e desenha um <li> pra cada tarefa */}
+        <ul>
+            {/* map percorre tarefasFiltradas e desenha uma linha pra cada tarefa */}
             {tarefasFiltradas.map((tarefa)=>(
-                <li key={tarefa.id} className='flex flex-col gap-2 p-3 bg-indigo-900 border border-amber-400 rounded-2xl shadow-sm hover:bg-indigo-500 transition-colors'>
-                    <div className="flex items-center justify-between">
-                        <span className={`font-bold text-white ${tarefa.concluida ? "line-through opacity-60" : ""}`}>{tarefa.nome}</span>
-                        <span className={`text-xs px-3 py-1 rounded-2xl ${corPrioridade(tarefa.prioridade)}`}>{tarefa.prioridade}</span>
+                <li key={tarefa.id} className='flex items-center justify-between gap-4 py-4 border-b border-zinc-800 last:border-b-0'>
+                    <div className="flex flex-col gap-0.5">
+                        <span className={`text-lg font-bold ${tarefa.concluida ? "text-zinc-600 line-through" : "text-white"}`}>{tarefa.nome}</span>
+                        {tarefa.descricao && <span className={`text-sm ${tarefa.concluida ? "text-zinc-700" : "text-zinc-400"}`}>{tarefa.descricao}</span>}
+                        <div className="flex items-center gap-2 mt-1">
+                            {tarefa.data && <span className="text-xs text-zinc-500">{tarefa.data}</span>}
+                            <span className={`text-xs border px-2 py-0.5 rounded-full ${corPrioridade(tarefa.prioridade)}`}>{tarefa.prioridade}</span>
+                        </div>
                     </div>
 
-                    {tarefa.data && <span className="text-sm text-amber-300">Data: {tarefa.data}</span>}
-                    {tarefa.descricao && <span className="text-sm text-white">{tarefa.descricao}</span>}
-
-                    <div className="flex gap-2 justify-end mt-1">
-                        {/* callback passado pro onClick: uma função anônima que chama ConcluirTarefa com o id da tarefa */}
-                        <button onClick={() => ConcluirTarefa(tarefa.id)} className="bg-green-500 hover:bg-green-700 text-white font-medium px-4 rounded-2xl transition-colors cursor-pointer">
-                            {tarefa.concluida ? "Desmarcar" : "Concluir"}
-                        </button>
-                        <button onClick={() => RemoverTarefa(tarefa.id)} className=" bg-red-400 hover:bg-red-700 text-amber-300 font-medium px-5 rounded-2xl transition-colors cursor-pointer"> Excluir</button>
+                    <div className="flex gap-2 shrink-0">
+                        {/* callback: função anônima que chama ConcluirTarefa passando o id da tarefa clicada */}
+                        {!tarefa.concluida &&
+                            <button onClick={() => ConcluirTarefa(tarefa.id)} className="border border-green-500/40 bg-green-500/10 text-green-400 hover:bg-green-500/20 text-sm font-medium px-4 py-1.5 rounded-full transition-colors cursor-pointer">
+                                Concluir
+                            </button>
+                        }
+                        {tarefa.concluida &&
+                            <button onClick={() => ConcluirTarefa(tarefa.id)} className="border border-zinc-700 text-zinc-500 hover:bg-zinc-800 text-sm font-medium px-4 py-1.5 rounded-full transition-colors cursor-pointer">
+                                Desmarcar
+                            </button>
+                        }
+                        <button onClick={() => RemoverTarefa(tarefa.id)} className="border border-red-500/40 bg-red-500/10 text-red-400 hover:bg-red-500/20 text-sm font-medium px-4 py-1.5 rounded-full transition-colors cursor-pointer"> Excluir</button>
                     </div>
                 </li>
             ))}
 
         </ul>
-        {tarefasFiltradas.length == 0 && <p className="text-center italic mt-4 text-white"> Nenhuma tarefa encontrada</p>}
-      
+        {tarefasFiltradas.length == 0 &&
+            <p className="text-center text-zinc-600 py-8"> Nenhuma tarefa encontrada </p>
+        }
+
     </div>
   )
 }
