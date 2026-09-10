@@ -1,9 +1,9 @@
-import React from 'react'
+import Tarefas from './components/Tarefas'
 
 const App = () => {
   return (
     <>
-      
+      <Tarefas/>
     </>
   )
 }
