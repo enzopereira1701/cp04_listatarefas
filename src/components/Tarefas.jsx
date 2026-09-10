@@ -88,6 +88,24 @@ const Tarefas = () => {
             <button type="submit" className=" bg-indigo-950 hover:bg-indigo-400 text-amber-300 font-medium px-5 py-2 rounded-2xl transition-colors cursor-pointer"> Adicionar </button>
         </form>
 
+        <ul className='space-y-3'>
+            {/* map percorre o array tarefas e desenha um <li> pra cada uma */}
+            {tarefas.map((tarefa)=>(
+                <li key={tarefa.id} className='flex flex-col gap-2 p-3 bg-indigo-900 border border-amber-400 rounded-2xl shadow-sm hover:bg-indigo-500 transition-colors'>
+                    <div className="flex items-center justify-between">
+                        <span className="font-bold text-white">{tarefa.nome}</span>
+                        <span className="text-xs text-amber-300">{tarefa.prioridade}</span>
+                    </div>
+
+                    {tarefa.data && <span className="text-sm text-amber-300">Data: {tarefa.data}</span>}
+                    {tarefa.descricao && <span className="text-sm text-white">{tarefa.descricao}</span>}
+                </li>
+            ))}
+
+        </ul>
+        {tarefas.length == 0 && <p className="text-center italic mt-4 text-white"> Nenhuma tarefa salva</p>}
+
+
     </div>
   )
 }
