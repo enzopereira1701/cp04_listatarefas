@@ -56,6 +56,14 @@ const Tarefas = () => {
         setTarefas(atualizarTarefas);
     }
 
+    const RemoverTarefa=(id) => {
+        // Verifica se a tarefa atual é diferente do id que deseja apagar se o id for igual (tarefa que deseja apagar) a 
+        // comdição retorna false e o item é excluido 
+        const apagarTarefa = tarefas.filter((tarefa)=> tarefa.id !== id)
+        setTarefas(apagarTarefa);
+
+    }
+
 
   return (
     <div className ='max-w-md mx-auto mt-10 bg-indigo-500 rounded-2xl shadow-indigo-950- border-b-blue-950 p-6' >
@@ -110,11 +118,12 @@ const Tarefas = () => {
                     {tarefa.data && <span className="text-sm text-amber-300">Data: {tarefa.data}</span>}
                     {tarefa.descricao && <span className="text-sm text-white">{tarefa.descricao}</span>}
 
-                    <div className="flex justify-end mt-1">
+                    <div className="flex gap-2 justify-end mt-1">
                         {/* callback passado pro onClick: uma função anônima que chama ConcluirTarefa com o id da tarefa */}
                         <button onClick={() => ConcluirTarefa(tarefa.id)} className="bg-green-500 hover:bg-green-700 text-white font-medium px-4 rounded-2xl transition-colors cursor-pointer">
                             {tarefa.concluida ? "Desmarcar" : "Concluir"}
                         </button>
+                        <button onClick={() => RemoverTarefa(tarefa.id)} className=" bg-red-400 hover:bg-red-700 text-amber-300 font-medium px-5 rounded-2xl transition-colors cursor-pointer"> Excluir</button>
                     </div>
                 </li>
             ))}
