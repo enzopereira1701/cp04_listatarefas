@@ -16,6 +16,9 @@ const Tarefas = () => {
     const [campoDescricao, setCampoDescricao] = useState("");
     const [campoPrioridade, setCampoPrioridade] = useState("Baixa");
 
+    // Estado que controla qual filtro está ativo: "todas", "pendentes" ou "concluidas"
+    const [filtro, setFiltro] = useState("todas");
+
 // HOOK - useEffect - realiza o efeito colateral, nesse caso salva a lista de tarefas
 // no localStorage toda vez que o componente renderizar
         useEffect(() => {
@@ -64,6 +67,14 @@ const Tarefas = () => {
 
     }
 
+    // Usa o método filter para decidir quais tarefas aparecem na tela
+    // de acordo com o botão de filtro selecionado
+    const tarefasFiltradas = tarefas.filter((tarefa) => {
+        if (filtro === "pendentes") return !tarefa.concluida;
+        if (filtro === "concluidas") return tarefa.concluida;
+        return true; // filtro === "todas"
+    })
+
 
   return (
     <div className ='max-w-md mx-auto mt-10 bg-indigo-500 rounded-2xl shadow-indigo-950- border-b-blue-950 p-6' >
@@ -106,9 +117,16 @@ const Tarefas = () => {
             <button type="submit" className=" bg-indigo-950 hover:bg-indigo-400 text-amber-300 font-medium px-5 py-2 rounded-2xl transition-colors cursor-pointer"> Adicionar </button>
         </form>
 
+        {/* Botões de filtro rápido (Todas, Pendentes, Concluídas) */}
+        <div className="flex gap-2 mb-4 justify-center">
+            <button onClick={() => setFiltro("todas")} className={`px-4 py-1 rounded-2xl font-medium cursor-pointer transition-colors ${filtro === "todas" ? "bg-indigo-950 text-amber-300" : "bg-indigo-400 text-white hover:bg-indigo-950"}`}> Todas </button>
+            <button onClick={() => setFiltro("pendentes")} className={`px-4 py-1 rounded-2xl font-medium cursor-pointer transition-colors ${filtro === "pendentes" ? "bg-indigo-950 text-amber-300" : "bg-indigo-400 text-white hover:bg-indigo-950"}`}> Pendentes </button>
+            <button onClick={() => setFiltro("concluidas")} className={`px-4 py-1 rounded-2xl font-medium cursor-pointer transition-colors ${filtro === "concluidas" ? "bg-indigo-950 text-amber-300" : "bg-indigo-400 text-white hover:bg-indigo-950"}`}> Concluídas </button>
+        </div>
+
         <ul className='space-y-3'>
-            {/* map percorre o array tarefas e desenha um <li> pra cada uma */}
-            {tarefas.map((tarefa)=>(
+            {/* map percorre o array tarefasFiltradas (não mais o tarefas direto) e desenha um <li> pra cada uma */}
+            {tarefasFiltradas.map((tarefa)=>(
                 <li key={tarefa.id} className='flex flex-col gap-2 p-3 bg-indigo-900 border border-amber-400 rounded-2xl shadow-sm hover:bg-indigo-500 transition-colors'>
                     <div className="flex items-center justify-between">
                         <span className={`font-bold text-white ${tarefa.concluida ? "line-through opacity-60" : ""}`}>{tarefa.nome}</span>
@@ -129,7 +147,7 @@ const Tarefas = () => {
             ))}
 
         </ul>
-        {tarefas.length == 0 && <p className="text-center italic mt-4 text-white"> Nenhuma tarefa salva</p>}
+        {tarefasFiltradas.length == 0 && <p className="text-center italic mt-4 text-white"> Nenhuma tarefa encontrada</p>}
 
     </div>
   )
